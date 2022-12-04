@@ -2,44 +2,44 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
 
-export const protobufPackage = "voter.voter";
+export const protobufPackage = "blog.blog";
 
-export interface MsgCreatePoll {
+export interface Poll {
   creator: string;
+  id: number;
   title: string;
   description: string;
   options: string[];
 }
 
-export interface MsgCreatePollResponse {
-  id: number;
+function createBasePoll(): Poll {
+  return { creator: "", id: 0, title: "", description: "", options: [] };
 }
 
-function createBaseMsgCreatePoll(): MsgCreatePoll {
-  return { creator: "", title: "", description: "", options: [] };
-}
-
-export const MsgCreatePoll = {
-  encode(message: MsgCreatePoll, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const Poll = {
+  encode(message: Poll, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
     }
+    if (message.id !== 0) {
+      writer.uint32(16).uint64(message.id);
+    }
     if (message.title !== "") {
-      writer.uint32(18).string(message.title);
+      writer.uint32(26).string(message.title);
     }
     if (message.description !== "") {
-      writer.uint32(26).string(message.description);
+      writer.uint32(34).string(message.description);
     }
     for (const v of message.options) {
-      writer.uint32(34).string(v!);
+      writer.uint32(42).string(v!);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgCreatePoll {
+  decode(input: _m0.Reader | Uint8Array, length?: number): Poll {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgCreatePoll();
+    const message = createBasePoll();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -47,12 +47,15 @@ export const MsgCreatePoll = {
           message.creator = reader.string();
           break;
         case 2:
-          message.title = reader.string();
+          message.id = longToNumber(reader.uint64() as Long);
           break;
         case 3:
-          message.description = reader.string();
+          message.title = reader.string();
           break;
         case 4:
+          message.description = reader.string();
+          break;
+        case 5:
           message.options.push(reader.string());
           break;
         default:
@@ -63,18 +66,20 @@ export const MsgCreatePoll = {
     return message;
   },
 
-  fromJSON(object: any): MsgCreatePoll {
+  fromJSON(object: any): Poll {
     return {
       creator: isSet(object.creator) ? String(object.creator) : "",
+      id: isSet(object.id) ? Number(object.id) : 0,
       title: isSet(object.title) ? String(object.title) : "",
       description: isSet(object.description) ? String(object.description) : "",
       options: Array.isArray(object?.options) ? object.options.map((e: any) => String(e)) : [],
     };
   },
 
-  toJSON(message: MsgCreatePoll): unknown {
+  toJSON(message: Poll): unknown {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
+    message.id !== undefined && (obj.id = Math.round(message.id));
     message.title !== undefined && (obj.title = message.title);
     message.description !== undefined && (obj.description = message.description);
     if (message.options) {
@@ -85,85 +90,16 @@ export const MsgCreatePoll = {
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<MsgCreatePoll>, I>>(object: I): MsgCreatePoll {
-    const message = createBaseMsgCreatePoll();
+  fromPartial<I extends Exact<DeepPartial<Poll>, I>>(object: I): Poll {
+    const message = createBasePoll();
     message.creator = object.creator ?? "";
+    message.id = object.id ?? 0;
     message.title = object.title ?? "";
     message.description = object.description ?? "";
     message.options = object.options?.map((e) => e) || [];
     return message;
   },
 };
-
-function createBaseMsgCreatePollResponse(): MsgCreatePollResponse {
-  return { id: 0 };
-}
-
-export const MsgCreatePollResponse = {
-  encode(message: MsgCreatePollResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.id !== 0) {
-      writer.uint32(8).uint64(message.id);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgCreatePollResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgCreatePollResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.id = longToNumber(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): MsgCreatePollResponse {
-    return { id: isSet(object.id) ? Number(object.id) : 0 };
-  },
-
-  toJSON(message: MsgCreatePollResponse): unknown {
-    const obj: any = {};
-    message.id !== undefined && (obj.id = Math.round(message.id));
-    return obj;
-  },
-
-  fromPartial<I extends Exact<DeepPartial<MsgCreatePollResponse>, I>>(object: I): MsgCreatePollResponse {
-    const message = createBaseMsgCreatePollResponse();
-    message.id = object.id ?? 0;
-    return message;
-  },
-};
-
-/** Msg defines the Msg service. */
-export interface Msg {
-  /** this line is used by starport scaffolding # proto/tx/rpc */
-  CreatePoll(request: MsgCreatePoll): Promise<MsgCreatePollResponse>;
-}
-
-export class MsgClientImpl implements Msg {
-  private readonly rpc: Rpc;
-  constructor(rpc: Rpc) {
-    this.rpc = rpc;
-    this.CreatePoll = this.CreatePoll.bind(this);
-  }
-  CreatePoll(request: MsgCreatePoll): Promise<MsgCreatePollResponse> {
-    const data = MsgCreatePoll.encode(request).finish();
-    const promise = this.rpc.request("voter.voter.Msg", "CreatePoll", data);
-    return promise.then((data) => MsgCreatePollResponse.decode(new _m0.Reader(data)));
-  }
-}
-
-interface Rpc {
-  request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;
-}
 
 declare var self: any | undefined;
 declare var window: any | undefined;

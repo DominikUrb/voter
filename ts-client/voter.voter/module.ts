@@ -7,10 +7,21 @@ import { msgTypes } from './registry';
 import { IgniteClient } from "../client"
 import { MissingWalletError } from "../helpers"
 import { Api } from "./rest";
+import { MsgCreatePoll } from "./types/voter/voter/tx";
 
 
-export {  };
+export { MsgCreatePoll };
 
+type sendMsgCreatePollParams = {
+  value: MsgCreatePoll,
+  fee?: StdFee,
+  memo?: string
+};
+
+
+type msgCreatePollParams = {
+  value: MsgCreatePoll,
+};
 
 
 export const registry = new Registry(msgTypes);
@@ -30,6 +41,28 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 
   return {
 		
+		async sendMsgCreatePoll({ value, fee, memo }: sendMsgCreatePollParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgCreatePoll: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgCreatePoll({ value: MsgCreatePoll.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+			} catch (e: any) {
+				throw new Error('TxClient:sendMsgCreatePoll: Could not broadcast Tx: '+ e.message)
+			}
+		},
+		
+		
+		msgCreatePoll({ value }: msgCreatePollParams): EncodeObject {
+			try {
+				return { typeUrl: "/voter.voter.MsgCreatePoll", value: MsgCreatePoll.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgCreatePoll: Could not create message: ' + e.message)
+			}
+		},
 		
 	}
 };

@@ -10,4 +10,8 @@ message Poll {
   string title = 3;
   string description = 4;
   repeated string options = 5;
+//  TODO: add
+//  int64 creationTimestamp = 6;
+//  int64 startTimestamp = 7;
+//  int64 endTimestamp = 8;
 }

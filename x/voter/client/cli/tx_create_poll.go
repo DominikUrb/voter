@@ -1,8 +1,8 @@
 package cli
 
 import (
-	"github.com/spf13/cast"
 	"strconv"
+	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -22,11 +22,7 @@ func CmdCreatePoll() *cobra.Command {
 			argTitle := args[0]
 			argDescription := args[1]
 			argOptions := args[2]
-
-			argOptionsSlice, err := cast.ToStringSliceE(argOptions)
-			if err != nil {
-				return err
-			}
+			argOptionsSlice := strings.Split(argOptions, ",")
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {

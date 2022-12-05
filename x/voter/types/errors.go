@@ -8,5 +8,7 @@ import (
 
 // x/voter module sentinel errors
 var (
-	ErrSample = sdkerrors.Register(ModuleName, 1100, "sample error")
+	ErrSample                = sdkerrors.Register(ModuleName, 1100, "sample error")
+	ErrNotEnoughPollOptions  = sdkerrors.Register(ModuleName, 1200, "poll must to have at least 2 options")
+	ErrDuplicatedPollOptions = sdkerrors.Register(ModuleName, 1300, "poll options must not contain duplicates")
 )

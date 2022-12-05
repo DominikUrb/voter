@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package blog.blog;
+package voter.voter;
 
 option go_package = "voter/x/voter/types";
 

@@ -2,7 +2,7 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
 
-export const protobufPackage = "blog.blog";
+export const protobufPackage = "voter.voter";
 
 export interface Poll {
   creator: string;

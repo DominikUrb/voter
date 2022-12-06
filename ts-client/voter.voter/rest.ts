@@ -152,6 +152,22 @@ export interface VoterQueryParamsResponse {
   params?: VoterParams;
 }
 
+export interface VoterQueryPollVotesResponse {
+  Poll?: VoterPoll;
+  Vote?: VoterVote[];
+
+  /**
+   * PageResponse is to be embedded in gRPC response messages where the
+   * corresponding request message has used PageRequest.
+   *
+   *  message SomeResponse {
+   *          repeated Bar results = 1;
+   *          PageResponse page = 2;
+   *  }
+   */
+  pagination?: V1Beta1PageResponse;
+}
+
 export interface VoterQueryPollsResponse {
   Poll?: VoterPoll[];
 
@@ -317,6 +333,33 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     this.request<VoterQueryParamsResponse, RpcStatus>({
       path: `/voter/voter/params`,
       method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryPollVotes
+   * @summary Queries a list of PollVotes items.
+   * @request GET:/voter/voter/poll_votes/{id}
+   */
+  queryPollVotes = (
+    id: string,
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<VoterQueryPollVotesResponse, RpcStatus>({
+      path: `/voter/voter/poll_votes/${id}`,
+      method: "GET",
+      query: query,
       format: "json",
       ...params,
     });

@@ -32,6 +32,11 @@ service Query {
 		option (google.api.http).get = "/voter/voter/vote";
 	}
 
+// Queries a list of PollVotes items.
+	rpc PollVotes(QueryPollVotesRequest) returns (QueryPollVotesResponse) {
+		option (google.api.http).get = "/voter/voter/poll_votes/{id}";
+	}
+
 // this line is used by starport scaffolding # 2
 }
 
@@ -68,6 +73,17 @@ message QueryAllVoteRequest {
 message QueryAllVoteResponse {
 	repeated Vote Vote = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryPollVotesRequest {
+	uint64 id = 1;
+	cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+message QueryPollVotesResponse {
+	Poll Poll = 1;
+	repeated Vote Vote = 2;
+	cosmos.base.query.v1beta1.PageResponse pagination = 3;
 }
 
 // this line is used by starport scaffolding # 3

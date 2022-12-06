@@ -15,11 +15,11 @@ var _ = strconv.Itoa(0)
 
 func CmdCreateVote() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-vote [options] [poll-id]",
+		Use:   "create-vote [option] [poll-id]",
 		Short: "Broadcast message create-vote",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argOptions := args[0]
+			argOption := args[0]
 			argPollID, err := cast.ToUint64E(args[1])
 			if err != nil {
 				return err
@@ -32,7 +32,7 @@ func CmdCreateVote() *cobra.Command {
 
 			msg := types.NewMsgCreateVote(
 				clientCtx.GetFromAddress().String(),
-				argOptions,
+				argOption,
 				argPollID,
 			)
 			if err := msg.ValidateBasic(); err != nil {

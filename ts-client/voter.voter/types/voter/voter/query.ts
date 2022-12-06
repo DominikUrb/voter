@@ -44,6 +44,17 @@ export interface QueryAllVoteResponse {
   pagination: PageResponse | undefined;
 }
 
+export interface QueryPollVotesRequest {
+  id: number;
+  pagination: PageRequest | undefined;
+}
+
+export interface QueryPollVotesResponse {
+  Poll: Poll | undefined;
+  Vote: Vote[];
+  pagination: PageResponse | undefined;
+}
+
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
 }
@@ -456,6 +467,141 @@ export const QueryAllVoteResponse = {
   },
 };
 
+function createBaseQueryPollVotesRequest(): QueryPollVotesRequest {
+  return { id: 0, pagination: undefined };
+}
+
+export const QueryPollVotesRequest = {
+  encode(message: QueryPollVotesRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.id !== 0) {
+      writer.uint32(8).uint64(message.id);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryPollVotesRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryPollVotesRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = longToNumber(reader.uint64() as Long);
+          break;
+        case 2:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryPollVotesRequest {
+    return {
+      id: isSet(object.id) ? Number(object.id) : 0,
+      pagination: isSet(object.pagination) ? PageRequest.fromJSON(object.pagination) : undefined,
+    };
+  },
+
+  toJSON(message: QueryPollVotesRequest): unknown {
+    const obj: any = {};
+    message.id !== undefined && (obj.id = Math.round(message.id));
+    message.pagination !== undefined
+      && (obj.pagination = message.pagination ? PageRequest.toJSON(message.pagination) : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryPollVotesRequest>, I>>(object: I): QueryPollVotesRequest {
+    const message = createBaseQueryPollVotesRequest();
+    message.id = object.id ?? 0;
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PageRequest.fromPartial(object.pagination)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseQueryPollVotesResponse(): QueryPollVotesResponse {
+  return { Poll: undefined, Vote: [], pagination: undefined };
+}
+
+export const QueryPollVotesResponse = {
+  encode(message: QueryPollVotesResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.Poll !== undefined) {
+      Poll.encode(message.Poll, writer.uint32(10).fork()).ldelim();
+    }
+    for (const v of message.Vote) {
+      Vote.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryPollVotesResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryPollVotesResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.Poll = Poll.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.Vote.push(Vote.decode(reader, reader.uint32()));
+          break;
+        case 3:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryPollVotesResponse {
+    return {
+      Poll: isSet(object.Poll) ? Poll.fromJSON(object.Poll) : undefined,
+      Vote: Array.isArray(object?.Vote) ? object.Vote.map((e: any) => Vote.fromJSON(e)) : [],
+      pagination: isSet(object.pagination) ? PageResponse.fromJSON(object.pagination) : undefined,
+    };
+  },
+
+  toJSON(message: QueryPollVotesResponse): unknown {
+    const obj: any = {};
+    message.Poll !== undefined && (obj.Poll = message.Poll ? Poll.toJSON(message.Poll) : undefined);
+    if (message.Vote) {
+      obj.Vote = message.Vote.map((e) => e ? Vote.toJSON(e) : undefined);
+    } else {
+      obj.Vote = [];
+    }
+    message.pagination !== undefined
+      && (obj.pagination = message.pagination ? PageResponse.toJSON(message.pagination) : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryPollVotesResponse>, I>>(object: I): QueryPollVotesResponse {
+    const message = createBaseQueryPollVotesResponse();
+    message.Poll = (object.Poll !== undefined && object.Poll !== null) ? Poll.fromPartial(object.Poll) : undefined;
+    message.Vote = object.Vote?.map((e) => Vote.fromPartial(e)) || [];
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PageResponse.fromPartial(object.pagination)
+      : undefined;
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -466,6 +612,8 @@ export interface Query {
   Vote(request: QueryGetVoteRequest): Promise<QueryGetVoteResponse>;
   /** Queries a list of Vote items. */
   VoteAll(request: QueryAllVoteRequest): Promise<QueryAllVoteResponse>;
+  /** Queries a list of PollVotes items. */
+  PollVotes(request: QueryPollVotesRequest): Promise<QueryPollVotesResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -476,6 +624,7 @@ export class QueryClientImpl implements Query {
     this.Polls = this.Polls.bind(this);
     this.Vote = this.Vote.bind(this);
     this.VoteAll = this.VoteAll.bind(this);
+    this.PollVotes = this.PollVotes.bind(this);
   }
   Params(request: QueryParamsRequest): Promise<QueryParamsResponse> {
     const data = QueryParamsRequest.encode(request).finish();
@@ -499,6 +648,12 @@ export class QueryClientImpl implements Query {
     const data = QueryAllVoteRequest.encode(request).finish();
     const promise = this.rpc.request("voter.voter.Query", "VoteAll", data);
     return promise.then((data) => QueryAllVoteResponse.decode(new _m0.Reader(data)));
+  }
+
+  PollVotes(request: QueryPollVotesRequest): Promise<QueryPollVotesResponse> {
+    const data = QueryPollVotesRequest.encode(request).finish();
+    const promise = this.rpc.request("voter.voter.Query", "PollVotes", data);
+    return promise.then((data) => QueryPollVotesResponse.decode(new _m0.Reader(data)));
   }
 }
 

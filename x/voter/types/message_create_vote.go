@@ -9,10 +9,10 @@ const TypeMsgCreateVote = "create_vote"
 
 var _ sdk.Msg = &MsgCreateVote{}
 
-func NewMsgCreateVote(creator string, options string, pollID uint64) *MsgCreateVote {
+func NewMsgCreateVote(creator string, option string, pollID uint64) *MsgCreateVote {
 	return &MsgCreateVote{
 		Creator: creator,
-		Options: options,
+		Option:  option,
 		PollID:  pollID,
 	}
 }

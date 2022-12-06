@@ -18,7 +18,7 @@ export interface MsgCreatePollResponse {
 
 export interface MsgCreateVote {
   creator: string;
-  options: string;
+  option: string;
   pollID: number;
   id: number;
 }
@@ -164,7 +164,7 @@ export const MsgCreatePollResponse = {
 };
 
 function createBaseMsgCreateVote(): MsgCreateVote {
-  return { creator: "", options: "", pollID: 0, id: 0 };
+  return { creator: "", option: "", pollID: 0, id: 0 };
 }
 
 export const MsgCreateVote = {
@@ -172,8 +172,8 @@ export const MsgCreateVote = {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
     }
-    if (message.options !== "") {
-      writer.uint32(18).string(message.options);
+    if (message.option !== "") {
+      writer.uint32(18).string(message.option);
     }
     if (message.pollID !== 0) {
       writer.uint32(24).uint64(message.pollID);
@@ -195,7 +195,7 @@ export const MsgCreateVote = {
           message.creator = reader.string();
           break;
         case 2:
-          message.options = reader.string();
+          message.option = reader.string();
           break;
         case 3:
           message.pollID = longToNumber(reader.uint64() as Long);
@@ -214,7 +214,7 @@ export const MsgCreateVote = {
   fromJSON(object: any): MsgCreateVote {
     return {
       creator: isSet(object.creator) ? String(object.creator) : "",
-      options: isSet(object.options) ? String(object.options) : "",
+      option: isSet(object.option) ? String(object.option) : "",
       pollID: isSet(object.pollID) ? Number(object.pollID) : 0,
       id: isSet(object.id) ? Number(object.id) : 0,
     };
@@ -223,7 +223,7 @@ export const MsgCreateVote = {
   toJSON(message: MsgCreateVote): unknown {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
-    message.options !== undefined && (obj.options = message.options);
+    message.option !== undefined && (obj.option = message.option);
     message.pollID !== undefined && (obj.pollID = Math.round(message.pollID));
     message.id !== undefined && (obj.id = Math.round(message.id));
     return obj;
@@ -232,7 +232,7 @@ export const MsgCreateVote = {
   fromPartial<I extends Exact<DeepPartial<MsgCreateVote>, I>>(object: I): MsgCreateVote {
     const message = createBaseMsgCreateVote();
     message.creator = object.creator ?? "";
-    message.options = object.options ?? "";
+    message.option = object.option ?? "";
     message.pollID = object.pollID ?? 0;
     message.id = object.id ?? 0;
     return message;

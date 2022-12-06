@@ -26,7 +26,7 @@ message MsgCreatePollResponse {
 
 message MsgCreateVote {
   string creator = 1;
-  string options = 2;
+  string option = 2;
   uint64 pollID = 3;
   uint64 id = 4;
 }

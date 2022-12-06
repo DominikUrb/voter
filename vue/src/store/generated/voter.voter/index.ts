@@ -40,6 +40,7 @@ const getDefaultState = () => {
 				Polls: {},
 				Vote: {},
 				VoteAll: {},
+				PollVotes: {},
 				
 				_Structure: {
 						Params: getStructure(Params.fromPartial({})),
@@ -96,6 +97,12 @@ export default {
 						(<any> params).query=null
 					}
 			return state.VoteAll[JSON.stringify(params)] ?? {}
+		},
+				getPollVotes: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.PollVotes[JSON.stringify(params)] ?? {}
 		},
 				
 		getTypeStructure: (state) => (type) => {
@@ -227,19 +234,32 @@ export default {
 		},
 		
 		
-		async sendMsgCreateVote({ rootGetters }, { value, fee = [], memo = '' }) {
+		
+		
+		 		
+		
+		
+		async QueryPollVotes({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
-				const client=await initClient(rootGetters)
-				const result = await client.VoterVoter.tx.sendMsgCreateVote({ value, fee: {amount: fee, gas: "200000"}, memo })
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgCreateVote:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgCreateVote:Send Could not broadcast Tx: '+ e.message)
+				const key = params ?? {};
+				const client = initClient(rootGetters);
+				let value= (await client.VoterVoter.query.queryPollVotes( key.id, query ?? undefined)).data
+				
+					
+				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
+					let next_values=(await client.VoterVoter.query.queryPollVotes( key.id, {...query ?? {}, 'pagination.key':(<any> value).pagination.next_key} as any)).data
+					value = mergeResults(value, next_values);
 				}
+				commit('QUERY', { query: 'PollVotes', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryPollVotes', payload: { options: { all }, params: {...key},query }})
+				return getters['getPollVotes']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryPollVotes API Node Unavailable. Could not perform query: ' + e.message)
+				
 			}
 		},
+		
+		
 		async sendMsgCreatePoll({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const client=await initClient(rootGetters)
@@ -253,20 +273,20 @@ export default {
 				}
 			}
 		},
-		
-		async MsgCreateVote({ rootGetters }, { value }) {
+		async sendMsgCreateVote({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
-				const client=initClient(rootGetters)
-				const msg = await client.VoterVoter.tx.msgCreateVote({value})
-				return msg
+				const client=await initClient(rootGetters)
+				const result = await client.VoterVoter.tx.sendMsgCreateVote({ value, fee: {amount: fee, gas: "200000"}, memo })
+				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
 					throw new Error('TxClient:MsgCreateVote:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgCreateVote:Create Could not create message: ' + e.message)
+				}else{
+					throw new Error('TxClient:MsgCreateVote:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
+		
 		async MsgCreatePoll({ rootGetters }, { value }) {
 			try {
 				const client=initClient(rootGetters)
@@ -277,6 +297,19 @@ export default {
 					throw new Error('TxClient:MsgCreatePoll:Init Could not initialize signing client. Wallet is required.')
 				} else{
 					throw new Error('TxClient:MsgCreatePoll:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgCreateVote({ rootGetters }, { value }) {
+			try {
+				const client=initClient(rootGetters)
+				const msg = await client.VoterVoter.tx.msgCreateVote({value})
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgCreateVote:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgCreateVote:Create Could not create message: ' + e.message)
 				}
 			}
 		},

@@ -16,6 +16,10 @@ func (k msgServer) CreateVote(goCtx context.Context, msg *types.MsgCreateVote) (
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %d doesn't exist", msg.Id))
 	}
 
+	if !contains(poll.Options, msg.Option) {
+		return nil, types.ErrInvalidPollOption
+	}
+
 	vote := types.Vote{
 		PollID:    msg.PollID,
 		Option:    msg.Option,
@@ -31,4 +35,13 @@ func (k msgServer) CreateVote(goCtx context.Context, msg *types.MsgCreateVote) (
 	id := k.AppendVote(ctx, vote)
 
 	return &types.MsgCreateVoteResponse{Id: id}, nil
+}
+
+func contains(values []string, value string) bool {
+	for _, v := range values {
+		if v == value {
+			return true
+		}
+	}
+	return false
 }

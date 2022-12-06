@@ -114,14 +114,15 @@ export interface VoterPoll {
   id?: string;
   title?: string;
   description?: string;
+  options?: string[];
 
   /**
    * TODO: add
-   *   int64 creationTimestamp = 6;
    *   int64 startTimestamp = 7;
    *   int64 endTimestamp = 8;
+   * @format int64
    */
-  options?: string[];
+  createdAt?: string;
 }
 
 export interface VoterQueryAllVoteResponse {

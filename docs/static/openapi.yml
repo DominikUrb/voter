@@ -44746,9 +44746,11 @@ paths:
                       type: array
                       items:
                         type: string
+                    createdAt:
+                      type: string
+                      format: int64
                       title: |-
                         TODO: add
-                          int64 creationTimestamp = 6;
                           int64 startTimestamp = 7;
                           int64 endTimestamp = 8;
               pagination:
@@ -74625,9 +74627,11 @@ definitions:
         type: array
         items:
           type: string
+      createdAt:
+        type: string
+        format: int64
         title: |-
           TODO: add
-            int64 creationTimestamp = 6;
             int64 startTimestamp = 7;
             int64 endTimestamp = 8;
   voter.voter.QueryAllVoteResponse:
@@ -74724,9 +74728,11 @@ definitions:
               type: array
               items:
                 type: string
+            createdAt:
+              type: string
+              format: int64
               title: |-
                 TODO: add
-                  int64 creationTimestamp = 6;
                   int64 startTimestamp = 7;
                   int64 endTimestamp = 8;
       pagination:

@@ -9,17 +9,17 @@ export interface Poll {
   id: number;
   title: string;
   description: string;
+  options: string[];
   /**
    * TODO: add
-   *  int64 creationTimestamp = 6;
    *  int64 startTimestamp = 7;
    *  int64 endTimestamp = 8;
    */
-  options: string[];
+  createdAt: number;
 }
 
 function createBasePoll(): Poll {
-  return { creator: "", id: 0, title: "", description: "", options: [] };
+  return { creator: "", id: 0, title: "", description: "", options: [], createdAt: 0 };
 }
 
 export const Poll = {
@@ -38,6 +38,9 @@ export const Poll = {
     }
     for (const v of message.options) {
       writer.uint32(42).string(v!);
+    }
+    if (message.createdAt !== 0) {
+      writer.uint32(48).int64(message.createdAt);
     }
     return writer;
   },
@@ -64,6 +67,9 @@ export const Poll = {
         case 5:
           message.options.push(reader.string());
           break;
+        case 6:
+          message.createdAt = longToNumber(reader.int64() as Long);
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -79,6 +85,7 @@ export const Poll = {
       title: isSet(object.title) ? String(object.title) : "",
       description: isSet(object.description) ? String(object.description) : "",
       options: Array.isArray(object?.options) ? object.options.map((e: any) => String(e)) : [],
+      createdAt: isSet(object.createdAt) ? Number(object.createdAt) : 0,
     };
   },
 
@@ -93,6 +100,7 @@ export const Poll = {
     } else {
       obj.options = [];
     }
+    message.createdAt !== undefined && (obj.createdAt = Math.round(message.createdAt));
     return obj;
   },
 
@@ -103,6 +111,7 @@ export const Poll = {
     message.title = object.title ?? "";
     message.description = object.description ?? "";
     message.options = object.options?.map((e) => e) || [];
+    message.createdAt = object.createdAt ?? 0;
     return message;
   },
 };

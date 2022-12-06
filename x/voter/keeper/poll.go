@@ -44,3 +44,18 @@ func (k Keeper) AppendPoll(ctx sdk.Context, post types.Poll) uint64 {
 
 	return count
 }
+
+func (k Keeper) GetPoll(ctx sdk.Context, id uint64) (val types.Poll, found bool) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.PollKey))
+
+	bz := make([]byte, 8)
+	binary.BigEndian.PutUint64(bz, id)
+
+	b := store.Get(bz)
+	if b == nil {
+		return val, false
+	}
+
+	k.cdc.MustUnmarshal(b, &val)
+	return val, true
+}

@@ -20,6 +20,7 @@ func (k msgServer) CreatePoll(goCtx context.Context, msg *types.MsgCreatePoll) (
 		Title:       msg.Title,
 		Description: msg.Description,
 		Options:     msg.Options,
+		CreatedAt:   ctx.BlockHeight(),
 	}
 	id := k.AppendPoll(ctx, post)
 

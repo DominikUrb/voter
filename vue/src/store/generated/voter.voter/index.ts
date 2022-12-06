@@ -260,19 +260,6 @@ export default {
 		},
 		
 		
-		async sendMsgCreatePoll({ rootGetters }, { value, fee = [], memo = '' }) {
-			try {
-				const client=await initClient(rootGetters)
-				const result = await client.VoterVoter.tx.sendMsgCreatePoll({ value, fee: {amount: fee, gas: "200000"}, memo })
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgCreatePoll:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgCreatePoll:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
 		async sendMsgCreateVote({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const client=await initClient(rootGetters)
@@ -286,20 +273,20 @@ export default {
 				}
 			}
 		},
-		
-		async MsgCreatePoll({ rootGetters }, { value }) {
+		async sendMsgCreatePoll({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
-				const client=initClient(rootGetters)
-				const msg = await client.VoterVoter.tx.msgCreatePoll({value})
-				return msg
+				const client=await initClient(rootGetters)
+				const result = await client.VoterVoter.tx.sendMsgCreatePoll({ value, fee: {amount: fee, gas: "200000"}, memo })
+				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
 					throw new Error('TxClient:MsgCreatePoll:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgCreatePoll:Create Could not create message: ' + e.message)
+				}else{
+					throw new Error('TxClient:MsgCreatePoll:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
+		
 		async MsgCreateVote({ rootGetters }, { value }) {
 			try {
 				const client=initClient(rootGetters)
@@ -310,6 +297,19 @@ export default {
 					throw new Error('TxClient:MsgCreateVote:Init Could not initialize signing client. Wallet is required.')
 				} else{
 					throw new Error('TxClient:MsgCreateVote:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgCreatePoll({ rootGetters }, { value }) {
+			try {
+				const client=initClient(rootGetters)
+				const msg = await client.VoterVoter.tx.msgCreatePoll({value})
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgCreatePoll:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgCreatePoll:Create Could not create message: ' + e.message)
 				}
 			}
 		},

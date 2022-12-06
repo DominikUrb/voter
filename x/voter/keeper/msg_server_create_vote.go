@@ -18,6 +18,7 @@ func (k msgServer) CreateVote(goCtx context.Context, msg *types.MsgCreateVote) (
 
 	vote := types.Vote{
 		PollID:    msg.PollID,
+		Option:    msg.Option,
 		Creator:   msg.Creator,
 		Id:        msg.Id,
 		CreatedAt: ctx.BlockHeight(),

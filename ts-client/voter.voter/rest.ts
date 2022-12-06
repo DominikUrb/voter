@@ -97,6 +97,11 @@ export interface VoterMsgCreatePollResponse {
   id?: string;
 }
 
+export interface VoterMsgCreateVoteResponse {
+  /** @format uint64 */
+  id?: string;
+}
+
 /**
  * Params defines the parameters for the module.
  */
@@ -109,7 +114,33 @@ export interface VoterPoll {
   id?: string;
   title?: string;
   description?: string;
+
+  /**
+   * TODO: add
+   *   int64 creationTimestamp = 6;
+   *   int64 startTimestamp = 7;
+   *   int64 endTimestamp = 8;
+   */
   options?: string[];
+}
+
+export interface VoterQueryAllVoteResponse {
+  Vote?: VoterVote[];
+
+  /**
+   * PageResponse is to be embedded in gRPC response messages where the
+   * corresponding request message has used PageRequest.
+   *
+   *  message SomeResponse {
+   *          repeated Bar results = 1;
+   *          PageResponse page = 2;
+   *  }
+   */
+  pagination?: V1Beta1PageResponse;
+}
+
+export interface VoterQueryGetVoteResponse {
+  Vote?: VoterVote;
 }
 
 /**
@@ -133,6 +164,19 @@ export interface VoterQueryPollsResponse {
    *  }
    */
   pagination?: V1Beta1PageResponse;
+}
+
+export interface VoterVote {
+  /** @format uint64 */
+  id?: string;
+  creator?: string;
+  option?: string;
+
+  /** @format uint64 */
+  pollID?: string;
+
+  /** @format int64 */
+  createdAt?: string;
 }
 
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, ResponseType } from "axios";
@@ -298,6 +342,48 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       path: `/voter/voter/polls`,
       method: "GET",
       query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryVoteAll
+   * @summary Queries a list of Vote items.
+   * @request GET:/voter/voter/vote
+   */
+  queryVoteAll = (
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<VoterQueryAllVoteResponse, RpcStatus>({
+      path: `/voter/voter/vote`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryVote
+   * @summary Queries a Vote by id.
+   * @request GET:/voter/voter/vote/{id}
+   */
+  queryVote = (id: string, params: RequestParams = {}) =>
+    this.request<VoterQueryGetVoteResponse, RpcStatus>({
+      path: `/voter/voter/vote/${id}`,
+      method: "GET",
       format: "json",
       ...params,
     });

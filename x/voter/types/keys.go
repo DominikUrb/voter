@@ -20,3 +20,8 @@ const (
 func KeyPrefix(p string) []byte {
 	return []byte(p)
 }
+
+const (
+	VoteKey      = "Vote/value/"
+	VoteCountKey = "Vote/count/"
+)

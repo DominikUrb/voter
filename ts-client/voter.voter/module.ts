@@ -7,10 +7,17 @@ import { msgTypes } from './registry';
 import { IgniteClient } from "../client"
 import { MissingWalletError } from "../helpers"
 import { Api } from "./rest";
+import { MsgCreateVote } from "./types/voter/voter/tx";
 import { MsgCreatePoll } from "./types/voter/voter/tx";
 
 
-export { MsgCreatePoll };
+export { MsgCreateVote, MsgCreatePoll };
+
+type sendMsgCreateVoteParams = {
+  value: MsgCreateVote,
+  fee?: StdFee,
+  memo?: string
+};
 
 type sendMsgCreatePollParams = {
   value: MsgCreatePoll,
@@ -18,6 +25,10 @@ type sendMsgCreatePollParams = {
   memo?: string
 };
 
+
+type msgCreateVoteParams = {
+  value: MsgCreateVote,
+};
 
 type msgCreatePollParams = {
   value: MsgCreatePoll,
@@ -41,6 +52,20 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 
   return {
 		
+		async sendMsgCreateVote({ value, fee, memo }: sendMsgCreateVoteParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgCreateVote: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgCreateVote({ value: MsgCreateVote.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+			} catch (e: any) {
+				throw new Error('TxClient:sendMsgCreateVote: Could not broadcast Tx: '+ e.message)
+			}
+		},
+		
 		async sendMsgCreatePoll({ value, fee, memo }: sendMsgCreatePollParams): Promise<DeliverTxResponse> {
 			if (!signer) {
 					throw new Error('TxClient:sendMsgCreatePoll: Unable to sign Tx. Signer is not present.')
@@ -55,6 +80,14 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
+		
+		msgCreateVote({ value }: msgCreateVoteParams): EncodeObject {
+			try {
+				return { typeUrl: "/voter.voter.MsgCreateVote", value: MsgCreateVote.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgCreateVote: Could not create message: ' + e.message)
+			}
+		},
 		
 		msgCreatePoll({ value }: msgCreatePollParams): EncodeObject {
 			try {

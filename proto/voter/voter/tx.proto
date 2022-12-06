@@ -8,6 +8,7 @@ option go_package = "voter/x/voter/types";
 // Msg defines the Msg service.
 service Msg {
       rpc CreatePoll(MsgCreatePoll) returns (MsgCreatePollResponse);
+  rpc CreateVote(MsgCreateVote) returns (MsgCreateVoteResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -16,9 +17,21 @@ message MsgCreatePoll {
   string title = 2;
   string description = 3;
   repeated string options = 4;
+  uint64 id = 5;
 }
 
 message MsgCreatePollResponse {
+  uint64 id = 1;
+}
+
+message MsgCreateVote {
+  string creator = 1;
+  string options = 2;
+  uint64 pollID = 3;
+  uint64 id = 4;
+}
+
+message MsgCreateVoteResponse {
   uint64 id = 1;
 }
 

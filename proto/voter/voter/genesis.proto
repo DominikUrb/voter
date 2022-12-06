@@ -3,6 +3,7 @@ package voter.voter;
 
 import "gogoproto/gogo.proto";
 import "voter/voter/params.proto";
+import "voter/voter/vote.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "voter/x/voter/types";
@@ -10,5 +11,7 @@ option go_package = "voter/x/voter/types";
 // GenesisState defines the voter module's genesis state.
 message GenesisState {
   Params params = 1 [(gogoproto.nullable) = false];
+  repeated Vote voteList = 2 [(gogoproto.nullable) = false];
+  uint64 voteCount = 3;
   // this line is used by starport scaffolding # genesis/proto/state
 }
